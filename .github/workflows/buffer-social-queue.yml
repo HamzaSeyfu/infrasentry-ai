@@ -1,4 +1,4 @@
-name: Send queued LinkedIn drafts to Buffer
+name: Publish queued LinkedIn posts through Buffer
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  send-drafts:
+  publish-posts:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -39,7 +39,7 @@ jobs:
           echo "count=$(wc -l < /tmp/queued_posts.txt | tr -d ' ')" >> "$GITHUB_OUTPUT"
           cat /tmp/queued_posts.txt
 
-      - name: Create Buffer drafts
+      - name: Publish LinkedIn posts now
         if: steps.queued.outputs.count != '0'
         env:
           BUFFER_API_KEY: ${{ secrets.CLEF_API_BUFFER }}
@@ -49,6 +49,6 @@ jobs:
           while IFS= read -r file; do
             [[ -z "$file" ]] && continue
             POST_TEXT="$(python -c 'import json,sys; data=json.load(open(sys.argv[1], encoding="utf-8")); text=str(data.get("text", "")).strip(); assert text, "text is required"; print(text)' "$file")"
-            echo "Creating Buffer draft from $file"
-            POST_TEXT="$POST_TEXT" python .github/scripts/buffer_create_draft.py
+            echo "Publishing LinkedIn post from $file"
+            POST_TEXT="$POST_TEXT" python .github/scripts/buffer_publish_post.py
           done < /tmp/queued_posts.txt
