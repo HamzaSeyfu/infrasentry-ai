@@ -1,0 +1,31 @@
+name: Create LinkedIn draft in Buffer
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: "LinkedIn post text"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  create-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Create Buffer draft
+        env:
+          BUFFER_API_KEY: ${{ secrets.CLEF_API_BUFFER }}
+          POST_TEXT: ${{ inputs.text }}
+        run: python .github/scripts/buffer_create_draft.py
