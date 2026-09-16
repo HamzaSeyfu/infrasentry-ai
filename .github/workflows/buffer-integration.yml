@@ -17,7 +17,23 @@ permissions:
   contents: read
 
 jobs:
+  validate-script:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate smoke-test script syntax
+        run: python -m py_compile .github/scripts/buffer_smoke_test.py
+
   verify-buffer-linkedin:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
