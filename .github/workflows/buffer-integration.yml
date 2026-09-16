@@ -47,5 +47,5 @@ jobs:
 
       - name: Verify Buffer authentication and LinkedIn channel
         env:
-          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          BUFFER_API_KEY: ${{ secrets.CLEF_API_BUFFER }}
         run: python .github/scripts/buffer_smoke_test.py
