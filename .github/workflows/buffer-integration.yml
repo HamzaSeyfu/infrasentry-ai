@@ -2,6 +2,12 @@ name: Buffer integration smoke test
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/scripts/buffer_smoke_test.py"
+      - ".github/workflows/buffer-integration.yml"
   pull_request:
     paths:
       - ".github/scripts/buffer_smoke_test.py"
