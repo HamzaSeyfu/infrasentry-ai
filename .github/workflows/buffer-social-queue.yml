@@ -1,0 +1,54 @@
+name: Send queued LinkedIn drafts to Buffer
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".social/queue/*.json"
+
+permissions:
+  contents: read
+
+jobs:
+  send-drafts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Find newly queued posts
+        id: queued
+        shell: bash
+        run: |
+          set -euo pipefail
+          BEFORE="${{ github.event.before }}"
+          if [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]]; then
+            git ls-tree -r --name-only "$GITHUB_SHA" -- '.social/queue/*.json' > /tmp/queued_posts.txt
+          else
+            git diff --name-only --diff-filter=A "$BEFORE" "$GITHUB_SHA" -- '.social/queue/*.json' > /tmp/queued_posts.txt
+          fi
+          echo "count=$(wc -l < /tmp/queued_posts.txt | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          cat /tmp/queued_posts.txt
+
+      - name: Create Buffer drafts
+        if: steps.queued.outputs.count != '0'
+        env:
+          BUFFER_API_KEY: ${{ secrets.CLEF_API_BUFFER }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r file; do
+            [[ -z "$file" ]] && continue
+            POST_TEXT="$(python -c 'import json,sys; data=json.load(open(sys.argv[1], encoding="utf-8")); text=str(data.get("text", "")).strip(); assert text, "text is required"; print(text)' "$file")"
+            echo "Creating Buffer draft from $file"
+            POST_TEXT="$POST_TEXT" python .github/scripts/buffer_create_draft.py
+          done < /tmp/queued_posts.txt
