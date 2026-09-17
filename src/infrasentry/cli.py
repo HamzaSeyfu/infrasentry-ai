@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Annotated
 
 import typer
 from pydantic import ValidationError
@@ -31,19 +32,20 @@ def _print_report(report: IncidentReport) -> None:
 
 @app.command()
 def investigate(
-    incident_file: Path = typer.Argument(
-        ...,
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        readable=True,
-        help="JSON file containing an incident and its evidence.",
-    ),
-    json_output: bool = typer.Option(
-        False,
-        "--json",
-        help="Print the complete incident report as JSON.",
-    ),
+    incident_file: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="JSON file containing an incident and its evidence.",
+        ),
+    ],
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Print the complete incident report as JSON."),
+    ] = False,
 ) -> None:
     """Diagnose an incident described by a JSON evidence file."""
     try:
