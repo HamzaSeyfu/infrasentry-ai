@@ -19,6 +19,38 @@ The first versions deliberately avoid relying on an LLM for raw facts. Determini
 - Small, reviewable increments
 - Useful without AI, better with AI
 
+## Diagnose a JSON incident
+
+InfraSentry can run its deterministic diagnosis engine against evidence stored in a JSON file:
+
+```json
+{
+  "incident": "API cannot reach database",
+  "evidence": [
+    {
+      "key": "dns_resolution",
+      "status": "fail",
+      "summary": "Database name does not resolve",
+      "details": {"hostname": "db.internal"}
+    }
+  ]
+}
+```
+
+Human-readable report:
+
+```bash
+infrasentry investigate incident.json
+```
+
+Machine-readable report, including the diagnosis:
+
+```bash
+infrasentry investigate incident.json --json
+```
+
+Input is validated before diagnosis. Evidence status must be `ok`, `fail`, or `unknown`.
+
 ## Initial roadmap
 
 - v0.1: core evidence and diagnosis model
@@ -31,4 +63,4 @@ The first versions deliberately avoid relying on an LLM for raw facts. Determini
 - v0.8: evaluation and regression framework
 - v1.0: documented end-to-end platform
 
-See `ROADMAP.md` for the detailed plan once the bootstrap PR lands.
+See `ROADMAP.md` for the detailed plan.
