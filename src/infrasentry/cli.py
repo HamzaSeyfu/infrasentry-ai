@@ -14,6 +14,7 @@ from infrasentry.report import build_report
 
 app = typer.Typer(help="Turn application outages into actionable diagnoses.")
 console = Console()
+error_console = Console(stderr=True)
 
 
 def _print_report(report: IncidentReport) -> None:
@@ -52,7 +53,7 @@ def investigate(
         payload = json.loads(incident_file.read_text(encoding="utf-8"))
         incident = IncidentInput.model_validate(payload)
     except (json.JSONDecodeError, ValidationError) as exc:
-        console.print(f"[bold red]Invalid incident file:[/bold red] {exc}", stderr=True)
+        error_console.print(f"[bold red]Invalid incident file:[/bold red] {exc}")
         raise typer.Exit(code=2) from exc
 
     report = build_report(incident.incident, incident.evidence)
