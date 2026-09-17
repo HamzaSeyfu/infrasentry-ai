@@ -18,6 +18,11 @@ class Evidence(BaseModel):
     details: dict[str, str | int | float | bool] = Field(default_factory=dict)
 
 
+class IncidentInput(BaseModel):
+    incident: str = Field(min_length=1)
+    evidence: list[Evidence] = Field(min_length=1)
+
+
 class Diagnosis(BaseModel):
     title: str
     probable_root_cause: str
