@@ -10,7 +10,7 @@ InfraSentry's goal is simple: turn an application outage into an actionable diag
 - [x] Add unit tests
 - [x] Add CI quality gate
 - [x] Add JSON incident input
-- [ ] Add confidence scoring based on evidence completeness
+- [x] Add confidence scoring based on evidence completeness
 
 ## v0.2 — Kubernetes evidence collector
 

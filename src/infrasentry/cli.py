@@ -29,6 +29,11 @@ def _print_report(report: IncidentReport) -> None:
     console.print(f"[bold]Root cause:[/bold] {report.diagnosis.probable_root_cause}")
     console.print(f"[bold]Remediation:[/bold] {report.diagnosis.remediation}")
     console.print(f"[bold]Confidence:[/bold] {report.diagnosis.confidence:.0%}")
+    completeness = report.evidence_completeness
+    console.print(
+        f"[bold]Evidence completeness:[/bold] {completeness.score:.0%} "
+        f"({completeness.observed}/{completeness.total} observed)"
+    )
 
 
 @app.command()
