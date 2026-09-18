@@ -31,7 +31,15 @@ class Diagnosis(BaseModel):
     supporting_evidence: list[str] = Field(default_factory=list)
 
 
+class EvidenceCompleteness(BaseModel):
+    score: float = Field(ge=0.0, le=1.0)
+    observed: int = Field(ge=0)
+    total: int = Field(ge=0)
+    unknown_evidence: list[str] = Field(default_factory=list)
+
+
 class IncidentReport(BaseModel):
     incident: str
     evidence: list[Evidence]
     diagnosis: Diagnosis
+    evidence_completeness: EvidenceCompleteness
