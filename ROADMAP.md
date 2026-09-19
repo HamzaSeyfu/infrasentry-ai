@@ -14,11 +14,11 @@ InfraSentry's goal is simple: turn an application outage into an actionable diag
 
 ## v0.2 — Kubernetes evidence collector
 
-- Kubernetes client integration
-- Pod status, restart count and readiness collection
-- Events and container logs
-- Service/endpoints inspection
-- DNS/connectivity checks
+- [x] Kubernetes client integration
+- [x] Pod status, restart count and readiness collection
+- [ ] Events and container logs
+- [ ] Service/endpoints inspection
+- [ ] DNS/connectivity checks
 
 ## v0.3 — Reproducible failure lab
 
