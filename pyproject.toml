@@ -9,6 +9,7 @@ description = "Local-first incident diagnosis for Kubernetes applications"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+  "kubernetes>=31,<34",
   "pydantic>=2.9,<3",
   "typer>=0.12,<1",
   "rich>=13.9,<14",
