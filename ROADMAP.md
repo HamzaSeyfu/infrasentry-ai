@@ -16,42 +16,42 @@ InfraSentry's goal is simple: turn an application outage into an actionable diag
 
 - [x] Kubernetes client integration
 - [x] Pod status, restart count and readiness collection
-- [ ] Events and container logs
+- [x] Events and container logs
 - [ ] Service/endpoints inspection
 - [ ] DNS/connectivity checks
 
 ## v0.3 — Reproducible failure lab
 
-- KIND demo cluster
-- Healthy baseline application
-- Broken DNS scenario
-- Missing Secret scenario
-- Service selector mismatch scenario
-- NetworkPolicy scenario
+- [ ] KIND demo cluster
+- [ ] Healthy baseline application
+- [ ] Broken DNS scenario
+- [ ] Missing Secret scenario
+- [ ] Service selector mismatch scenario
+- [ ] NetworkPolicy scenario
 
 ## v0.4 — Interfaces
 
-- Stable CLI investigation command
-- FastAPI service
-- Structured JSON reports
+- [ ] Stable CLI investigation command
+- [ ] FastAPI service
+- [ ] Structured JSON reports
 
 ## v0.5 — Local knowledge
 
-- Markdown runbook ingestion
-- Local embeddings/vector retrieval
-- Evidence-linked runbook suggestions
+- [ ] Markdown runbook ingestion
+- [ ] Local embeddings/vector retrieval
+- [ ] Evidence-linked runbook suggestions
 
 ## v0.6 — Local AI reasoning
 
-- Ollama provider
-- Structured model outputs
-- Tool-aware investigation planner
-- No paid API required
+- [ ] Ollama provider
+- [ ] Structured model outputs
+- [ ] Tool-aware investigation planner
+- [ ] No paid API required
 
 ## v0.7+ — Reliability
 
-- Prometheus integration
-- Evaluation dataset
-- Regression testing for diagnoses
-- Security-oriented incident scenarios
-- End-to-end documentation
+- [ ] Prometheus integration
+- [ ] Evaluation dataset
+- [ ] Regression testing for diagnoses
+- [ ] Security-oriented incident scenarios
+- [ ] End-to-end documentation
