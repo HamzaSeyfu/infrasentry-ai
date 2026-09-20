@@ -1,0 +1,5 @@
+{
+  "text": "InfraSentry vient de quitter le confort des fichiers d’exemple pour regarder un vrai cluster Kubernetes.\n\nLe premier collecteur est maintenant intégré : il interroge l’API Kubernetes, lit l’état d’un Pod, vérifie la readiness de ses conteneurs et compte leurs redémarrages. Ces observations deviennent ensuite des preuves structurées que le moteur de diagnostic peut raisonner sans dépendre d’une API d’IA payante.\n\nC’est une petite bascule dans le projet : jusque-là, InfraSentry savait analyser des faits qu’on lui donnait. Maintenant, il commence à aller les chercher lui-même.\n\nProchaine étape : événements Kubernetes, logs des conteneurs, Services et endpoints.\n\n#Kubernetes #DevOps #Python #AI #Cloud #CloudComputing #Automation #OpenSource #SoftwareEngineering #MLOps #SRE #Observability #Tech #Networking",
+  "reason": "First working Kubernetes collector merged into main, marking the start of live cluster evidence collection in v0.2.",
+  "source": "PR #11"
+}
