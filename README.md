@@ -1,27 +1,29 @@
 # InfraSentry AI
 
-> Turn application outages into actionable diagnoses.
+**Local-first incident investigation for Kubernetes applications.**
 
-InfraSentry AI is a local-first incident investigation tool for Kubernetes applications. It collects technical evidence from the cluster, builds a structured incident report, and helps identify the most likely root cause and remediation.
+InfraSentry AI collects technical evidence from a cluster, validates it, builds a structured incident report, and helps identify likely root causes and remediation paths. The project is designed around a simple principle: **facts first, inference second**.
 
-## Why this project exists
+## Why this project
 
-When an application fails, engineers often have to inspect pod state, events, logs, services, DNS, configuration, and network connectivity before they can even form a useful hypothesis. InfraSentry aims to shorten that investigation loop.
+Production incidents are rarely caused by a single obvious signal. Engineers often need to inspect pod state, events, logs, services, DNS, configuration, and network connectivity before they can form a useful hypothesis.
 
-The first versions deliberately avoid relying on an LLM for raw facts. Deterministic collectors gather evidence first. AI is added later as an optional reasoning and explanation layer.
+InfraSentry shortens that loop by turning raw operational signals into a reproducible diagnostic workflow.
 
-## Project principles
+## What is implemented
 
-- Local-first and usable without paid AI APIs
-- Evidence before inference
-- Reproducible failure scenarios
-- Testable diagnoses
-- Small, reviewable increments
-- Useful without AI, better with AI
+- Structured incident and evidence model
+- Input validation for incident payloads
+- Deterministic diagnosis engine
+- Human-readable and JSON reports
+- CLI workflow for local investigation
+- Test suite for core diagnosis behavior
+- Packaging through `pyproject.toml`
+- Architecture prepared for Kubernetes evidence collection and AI-assisted reasoning
 
-## Diagnose a JSON incident
+## Example
 
-InfraSentry can run its deterministic diagnosis engine against evidence stored in a JSON file:
+Given evidence such as:
 
 ```json
 {
@@ -37,21 +39,36 @@ InfraSentry can run its deterministic diagnosis engine against evidence stored i
 }
 ```
 
-Human-readable report:
+Run:
 
 ```bash
 infrasentry investigate incident.json
 ```
 
-Machine-readable report, including the diagnosis:
+or request machine-readable output:
 
 ```bash
 infrasentry investigate incident.json --json
 ```
 
-Input is validated before diagnosis. Evidence status must be `ok`, `fail`, or `unknown`.
+## Engineering principles
 
-## Initial roadmap
+- **Evidence before inference**: deterministic collectors establish facts before any AI layer is involved.
+- **Local-first**: the core tool remains useful without paid external APIs.
+- **Reproducibility**: incidents and failure scenarios should be replayable.
+- **Testability**: diagnoses should be verifiable through explicit evidence.
+- **Small reviewable increments**: each capability is designed to remain understandable and maintainable.
+
+## Architecture direction
+
+The project is evolving toward four layers:
+
+1. **Collectors**: Kubernetes and infrastructure evidence gathering.
+2. **Diagnosis engine**: deterministic rules and structured reasoning.
+3. **Interfaces**: CLI and API.
+4. **AI assistance**: local RAG and optional agentic reasoning over evidence and runbooks.
+
+## Roadmap
 
 - v0.1: core evidence and diagnosis model
 - v0.2: Kubernetes collector
@@ -63,4 +80,20 @@ Input is validated before diagnosis. Evidence status must be `ok`, `fail`, or `u
 - v0.8: evaluation and regression framework
 - v1.0: documented end-to-end platform
 
-See `ROADMAP.md` for the detailed plan.
+See [ROADMAP.md](ROADMAP.md) for the detailed plan.
+
+## Stack
+
+Python · Kubernetes · CLI tooling · testing · structured diagnostics · local AI/RAG roadmap
+
+## Repository layout
+
+- `src/` — application code
+- `tests/` — automated tests
+- `.github/` — repository automation
+- `ROADMAP.md` — implementation roadmap
+- `AUTONOMY.md` — project development constraints and operating principles
+
+---
+
+**Status:** active development. The current focus is building the deterministic investigation core before adding AI-assisted reasoning.
