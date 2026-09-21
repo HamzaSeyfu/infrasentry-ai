@@ -2,8 +2,8 @@ from types import SimpleNamespace
 
 from infrasentry.kubernetes_collector import (
     collect_container_logs,
-    collect_pod_evidence,
     collect_pod_events,
+    collect_pod_evidence,
 )
 from infrasentry.models import EvidenceStatus
 
