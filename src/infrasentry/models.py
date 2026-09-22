@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -15,7 +16,7 @@ class Evidence(BaseModel):
     key: str
     status: EvidenceStatus
     summary: str
-    details: dict[str, str | int | float | bool] = Field(default_factory=dict)
+    details: dict[str, Any] = Field(default_factory=dict)
 
 
 class IncidentInput(BaseModel):
