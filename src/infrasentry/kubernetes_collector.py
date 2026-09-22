@@ -20,6 +20,15 @@ def _core_api(core_api: client.CoreV1Api | None) -> client.CoreV1Api:
     return client.CoreV1Api()
 
 
+def _discovery_api(
+    discovery_api: client.DiscoveryV1Api | None,
+) -> client.DiscoveryV1Api:
+    if discovery_api is not None:
+        return discovery_api
+    load_kubernetes_config()
+    return client.DiscoveryV1Api()
+
+
 def collect_pod_evidence(
     namespace: str,
     pod_name: str,
@@ -128,3 +137,82 @@ def collect_container_logs(
             "logs": logs,
         },
     )
+
+
+def collect_service_evidence(
+    namespace: str,
+    service_name: str,
+    core_api: client.CoreV1Api | None = None,
+    discovery_api: client.DiscoveryV1Api | None = None,
+) -> list[Evidence]:
+    """Inspect a Service and its EndpointSlices without guessing cluster state."""
+    core_api = _core_api(core_api)
+    discovery_api = _discovery_api(discovery_api)
+
+    service = core_api.read_namespaced_service(name=service_name, namespace=namespace)
+    selector = service.spec.selector or {}
+    ports = [
+        {
+            "name": port.name,
+            "port": port.port,
+            "target_port": port.target_port,
+            "protocol": port.protocol,
+        }
+        for port in (service.spec.ports or [])
+    ]
+
+    slices = discovery_api.list_namespaced_endpoint_slice(
+        namespace=namespace,
+        label_selector=f"kubernetes.io/service-name={service_name}",
+    ).items or []
+
+    endpoint_count = 0
+    ready_endpoint_count = 0
+    addresses: list[str] = []
+    for endpoint_slice in slices:
+        for endpoint in endpoint_slice.endpoints or []:
+            endpoint_count += 1
+            addresses.extend(endpoint.addresses or [])
+            conditions = endpoint.conditions
+            if conditions is None or conditions.ready is not False:
+                ready_endpoint_count += 1
+
+    service_status = EvidenceStatus.OK if selector and ports else EvidenceStatus.FAIL
+    endpoint_status = (
+        EvidenceStatus.OK if ready_endpoint_count > 0 else EvidenceStatus.FAIL
+    )
+
+    return [
+        Evidence(
+            key="service_configuration",
+            status=service_status,
+            summary=(
+                f"Service {namespace}/{service_name} has a selector and {len(ports)} port(s)"
+                if service_status == EvidenceStatus.OK
+                else f"Service {namespace}/{service_name} is missing a selector or ports"
+            ),
+            details={
+                "namespace": namespace,
+                "service": service_name,
+                "selector": selector,
+                "ports": ports,
+            },
+        ),
+        Evidence(
+            key="service_endpoints",
+            status=endpoint_status,
+            summary=(
+                f"Service {namespace}/{service_name} has {ready_endpoint_count} ready endpoint(s)"
+                if ready_endpoint_count
+                else f"Service {namespace}/{service_name} has no ready endpoints"
+            ),
+            details={
+                "namespace": namespace,
+                "service": service_name,
+                "endpoint_slices": len(slices),
+                "endpoint_count": endpoint_count,
+                "ready_endpoint_count": ready_endpoint_count,
+                "addresses": addresses,
+            },
+        ),
+    ]
