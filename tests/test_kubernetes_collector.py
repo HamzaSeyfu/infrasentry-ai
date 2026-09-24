@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 
 from infrasentry.kubernetes_collector import (
+    collect_connectivity_evidence,
     collect_container_logs,
     collect_pod_events,
     collect_pod_evidence,
@@ -192,3 +193,61 @@ def test_marks_incomplete_service_configuration_as_failed():
     by_key = {item.key: item for item in evidence}
     assert by_key["service_configuration"].status == EvidenceStatus.FAIL
     assert by_key["service_endpoints"].status == EvidenceStatus.FAIL
+
+
+def test_collects_successful_dns_and_tcp_connectivity():
+    def resolver(host, port, type):
+        assert host == "api.production.svc"
+        return [(2, type, 6, "", ("10.96.0.12", port))]
+
+    connection = SimpleNamespace(closed=False)
+
+    def close():
+        connection.closed = True
+
+    connection.close = close
+
+    def connector(address, timeout):
+        assert address == ("api.production.svc", 8080)
+        assert timeout == 1.5
+        return connection
+
+    evidence = collect_connectivity_evidence(
+        "production", "api", 8080, resolver=resolver, connector=connector, timeout=1.5
+    )
+
+    assert [item.status for item in evidence] == [EvidenceStatus.OK, EvidenceStatus.OK]
+    assert evidence[0].details["addresses"] == ["10.96.0.12"]
+    assert connection.closed is True
+
+
+def test_dns_failure_skips_tcp_probe_as_unknown():
+    def resolver(host, port, type):
+        raise OSError("name or service not known")
+
+    def connector(address, timeout):
+        raise AssertionError("TCP probe must not run after DNS failure")
+
+    evidence = collect_connectivity_evidence(
+        "default", "backend", 80, resolver=resolver, connector=connector
+    )
+
+    assert evidence[0].status == EvidenceStatus.FAIL
+    assert evidence[1].status == EvidenceStatus.UNKNOWN
+    assert "name or service not known" in evidence[0].details["error"]
+
+
+def test_tcp_failure_is_reported_after_successful_dns():
+    def resolver(host, port, type):
+        return [(2, type, 6, "", ("10.96.0.20", port))]
+
+    def connector(address, timeout):
+        raise OSError("connection refused")
+
+    evidence = collect_connectivity_evidence(
+        "default", "backend", 443, resolver=resolver, connector=connector
+    )
+
+    assert evidence[0].status == EvidenceStatus.OK
+    assert evidence[1].status == EvidenceStatus.FAIL
+    assert evidence[1].details["error"] == "connection refused"

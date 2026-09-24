@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import socket
+from collections.abc import Callable
+
 from kubernetes import client, config
 
 from infrasentry.models import Evidence, EvidenceStatus
@@ -213,6 +216,99 @@ def collect_service_evidence(
                 "endpoint_count": endpoint_count,
                 "ready_endpoint_count": ready_endpoint_count,
                 "addresses": addresses,
+            },
+        ),
+    ]
+
+
+def collect_connectivity_evidence(
+    namespace: str,
+    service_name: str,
+    port: int,
+    *,
+    resolver: Callable[..., list[tuple]] = socket.getaddrinfo,
+    connector: Callable[..., object] = socket.create_connection,
+    timeout: float = 2.0,
+) -> list[Evidence]:
+    """Resolve a Kubernetes Service DNS name and probe one TCP connection.
+
+    The check runs from the InfraSentry process, so its evidence describes the
+    network view of that process. A future in-cluster probe can reuse the same
+    evidence contract without changing diagnosis rules.
+    """
+    host = f"{service_name}.{namespace}.svc"
+    addresses: list[str] = []
+    dns_error: str | None = None
+
+    try:
+        records = resolver(host, port, type=socket.SOCK_STREAM)
+        addresses = sorted({record[4][0] for record in records})
+    except OSError as exc:
+        dns_error = str(exc)
+
+    dns_status = EvidenceStatus.OK if addresses else EvidenceStatus.FAIL
+    dns_evidence = Evidence(
+        key="service_dns",
+        status=dns_status,
+        summary=(
+            f"Service DNS {host} resolves to {len(addresses)} address(es)"
+            if addresses
+            else f"Service DNS {host} did not resolve"
+        ),
+        details={
+            "namespace": namespace,
+            "service": service_name,
+            "host": host,
+            "addresses": addresses,
+            "error": dns_error,
+        },
+    )
+
+    if not addresses:
+        return [
+            dns_evidence,
+            Evidence(
+                key="service_connectivity",
+                status=EvidenceStatus.UNKNOWN,
+                summary=f"TCP connectivity to {host}:{port} was not tested because DNS failed",
+                details={
+                    "namespace": namespace,
+                    "service": service_name,
+                    "host": host,
+                    "port": port,
+                    "timeout_seconds": timeout,
+                },
+            ),
+        ]
+
+    connectivity_error: str | None = None
+    try:
+        connection = connector((host, port), timeout=timeout)
+        close = getattr(connection, "close", None)
+        if close is not None:
+            close()
+        connectivity_status = EvidenceStatus.OK
+    except OSError as exc:
+        connectivity_error = str(exc)
+        connectivity_status = EvidenceStatus.FAIL
+
+    return [
+        dns_evidence,
+        Evidence(
+            key="service_connectivity",
+            status=connectivity_status,
+            summary=(
+                f"TCP connection to {host}:{port} succeeded"
+                if connectivity_status == EvidenceStatus.OK
+                else f"TCP connection to {host}:{port} failed"
+            ),
+            details={
+                "namespace": namespace,
+                "service": service_name,
+                "host": host,
+                "port": port,
+                "timeout_seconds": timeout,
+                "error": connectivity_error,
             },
         ),
     ]
