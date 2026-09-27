@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo
+  namespace: infrasentry-lab
+spec:
+  selector:
+    app: echo
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5678
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dns-probe
+  namespace: infrasentry-lab
+spec:
+  restartPolicy: Never
+  containers:
+    - name: probe
+      image: busybox:1.36
+      command: ["sh", "-c", "nslookup echo-does-not-exist.infrasentry-lab.svc.cluster.local"]
