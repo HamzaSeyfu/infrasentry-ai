@@ -1,0 +1,5 @@
+{
+  "text": "InfraSentry a maintenant son propre petit terrain d’accident Kubernetes.\n\nJ’ai ajouté un lab local basé sur KIND avec une application saine, puis un scénario volontairement cassé : le Service pointe vers un sélecteur qui ne correspond plus aux Pods. Le workload continue de tourner, mais les EndpointSlices se vident. C’est exactement le genre de panne trompeuse où « le Pod est vert » ne veut pas dire « l’application est joignable ».\n\nL’intérêt n’est pas seulement de provoquer la panne. Elle devient reproductible, observable et pourra servir de référence pour vérifier que le diagnostic d’InfraSentry raconte bien ce qui s’est réellement passé. Le tout tourne localement, sans cloud ni API LLM payante.\n\nProchaine étape : enrichir ce laboratoire avec DNS cassé, Secret manquant et NetworkPolicy.\n\n#Kubernetes #DevOps #Cloud #CloudComputing #Python #AI #MLOps #Automation #OpenSource #SoftwareEngineering #SRE #Networking #Cybersecurity #Tech",
+  "reason": "First reproducible Kubernetes incident lab: KIND baseline plus a deterministic Service selector mismatch scenario.",
+  "source": "v0.3 reproducible failure lab"
+}

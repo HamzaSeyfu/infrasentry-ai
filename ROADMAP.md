@@ -22,11 +22,11 @@ InfraSentry's goal is simple: turn an application outage into an actionable diag
 
 ## v0.3 — Reproducible failure lab
 
-- [ ] KIND demo cluster
-- [ ] Healthy baseline application
+- [x] KIND demo cluster
+- [x] Healthy baseline application
 - [ ] Broken DNS scenario
 - [ ] Missing Secret scenario
-- [ ] Service selector mismatch scenario
+- [x] Service selector mismatch scenario
 - [ ] NetworkPolicy scenario
 
 ## v0.4 — Interfaces
