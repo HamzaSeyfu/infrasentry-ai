@@ -24,7 +24,7 @@ InfraSentry's goal is simple: turn an application outage into an actionable diag
 
 - [x] KIND demo cluster
 - [x] Healthy baseline application
-- [ ] Broken DNS scenario
+- [x] Broken DNS scenario
 - [ ] Missing Secret scenario
 - [x] Service selector mismatch scenario
 - [ ] NetworkPolicy scenario
