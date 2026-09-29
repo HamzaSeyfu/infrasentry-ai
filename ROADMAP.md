@@ -27,7 +27,7 @@ InfraSentry's goal is simple: turn an application outage into an actionable diag
 - [ ] Broken DNS scenario
 - [x] Missing Secret scenario
 - [x] Service selector mismatch scenario
-- [ ] NetworkPolicy scenario
+- [x] NetworkPolicy scenario
 
 ## v0.4 — Interfaces
 
