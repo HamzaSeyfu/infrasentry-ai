@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: infrasentry-dns-control
+spec:
+  containers:
+    - name: debug
+      image: busybox:1.36
+      command: ["sh", "-c", "sleep 3600"]
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: infrasentry-dns-broken
+spec:
+  dnsPolicy: None
+  dnsConfig:
+    nameservers:
+      - 192.0.2.53
+  containers:
+    - name: debug
+      image: busybox:1.36
+      command: ["sh", "-c", "sleep 3600"]
