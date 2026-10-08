@@ -1,0 +1,29 @@
+name: KIND incident lab
+
+on:
+  push:
+    paths:
+      - "lab/**"
+      - ".github/workflows/lab.yml"
+      - "tests/test_lab_manifests.py"
+  pull_request:
+    paths:
+      - "lab/**"
+      - ".github/workflows/lab.yml"
+      - "tests/test_lab_manifests.py"
+
+jobs:
+  incident-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start KIND cluster
+        uses: helm/kind-action@v1.14.0
+        with:
+          cluster_name: infrasentry
+          config: lab/kind-config.yaml
+      - name: Verify NetworkPolicy failure and recovery
+        run: bash lab/scripts/check-network-policy.sh
+      - name: Verify isolated DNS failure
+        run: bash lab/scripts/check-broken-dns.sh

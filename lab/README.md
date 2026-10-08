@@ -35,6 +35,14 @@ Restore the healthy Service with:
 kubectl apply -f lab/manifests/healthy.yaml
 ```
 
+## Additional incident scenarios
+
+- [Missing Secret](missing-secret.md): Pod cannot start because a referenced Secret is absent.
+- [NetworkPolicy](network-policy.md): Pods, endpoints and DNS are healthy, but ingress traffic is denied. Run `bash lab/scripts/check-network-policy.sh` to verify failure and recovery.
+- [Broken DNS](broken-dns.md): the control Pod resolves the Service, while a second Pod cannot resolve it but can still connect by IP. Run `bash lab/scripts/check-broken-dns.sh` to verify both observations.
+
+The NetworkPolicy lab requires kind v0.25.0+ with NetworkPolicy enforcement enabled. The GitHub Actions KIND lab runs the two network scenarios against a real cluster.
+
 ## Tear down
 
 ```bash
