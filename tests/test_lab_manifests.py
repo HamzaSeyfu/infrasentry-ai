@@ -3,7 +3,6 @@ from pathlib import Path
 import yaml
 
 
-
 MANIFESTS = Path(__file__).resolve().parents[1] / "lab" / "manifests"
 
 
